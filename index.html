@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>blackjack21</title>
+    <link href="style.css" rel="stylesheet" />
+    <script defer src="script.js"></script>
+  </head>
+  <body>
+    <div class="banker-points-container">
+      <p>Banker Points: <span id="banker-points"></span></p>
+    </div>
+
+    <div class="banker-card-container">
+      <img id="card" src="./cards/BACK.png" />
+    </div>
+
+    <p id="result-message" class="result-message"></p>
+
+    <div class="player-points-container">
+      <p>Your Points: <span id="your-points"></span></p>
+    </div>
+
+    <div class="player-card-container"></div>
+
+    <footer class="footer">
+      <div class="betting-area">
+        <p>Balance: $<span id="balance-amount">1000</span></p>
+        <p>Bet Amount: $<span id="current-bet-amount"></span></p>
+        <div class="chip-container">
+          <button class="chip" id="bet-5">$5</button>
+          <button class="chip" id="bet-10">$10</button>
+          <button class="chip" id="bet-25">$25</button>
+          <button class="chip" id="bet-50">$50</button>
+        </div>
+
+        <div class="bet-controls">
+          <button class="button" id="undo-button">Undo Bet</button>
+          <button class="button" id="repeat-button">Repeat Bet</button>
+          <button class="button" id="clear-button">Clear Bet</button>
+          <button class="button" id="deal-button">Deal 💵</button>
+        </div>
+      </div>
+
+      <div class="ingame-controls">
+        <button class="button" id="double-button">Double Bet</button>
+        <button class="button" id="hit-button">Hit</button>
+        <button class="button" id="stand-button">Stand</button>
+        <button class="button" id="run-button">🏃</button>
+      </div>
+    </footer>
+  </body>
+</html>
