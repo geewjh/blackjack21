@@ -19,7 +19,7 @@ const values = [
 const messages = {
   win: "dollar dollar bill 💰.",
   lose: "you win some, you lose some.",
-  playerBJ: "winner winner chicken dinner",
+  playerBJ: "winner winner chicken dinner 🐤",
   playerBB: "you have won x 3 bet.",
   player777: "you have won x 7 bet.",
   bankerBJ: "you have been served a nice warm 🍽️ of blackjack from the banker.",
