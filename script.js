@@ -33,8 +33,8 @@ const messages = {
 /*----- state variables -----*/
 const deck = {
   shuffled: [],
-  bankerCards: [],
-  playerCards: [],
+  bankerHand: [],
+  playerHand: [],
 };
 
 const handPoints = {
@@ -44,6 +44,7 @@ const handPoints = {
 
 const gameState = {
   gameOver: false,
+  bankerFirstCardHidden: true,
   playerBlackJack: false,
   playerBanBan: false,
   playerTrips7: false,
@@ -75,6 +76,7 @@ const chips = {
 
 const inputChoices = {
   undo: document.querySelector("#undo-button"),
+  clear: document.querySelector("#clear-button"),
   deal: document.querySelector("#deal-button"),
 };
 
@@ -84,10 +86,20 @@ const inGameChoices = {
   stand: document.querySelector("#stand-button"),
   run: document.querySelector("#run-button"),
 };
+
+const cardContainer = {
+  bankerCard: document.querySelector(".banker-card-container"),
+  playerCard: document.querySelector(".player-card-container"),
+};
+
+const balanceAndBettingAmt = {
+  balanceAmount: document.querySelector("#balance-amount"),
+  bettingAmount: document.querySelector("#current-bet-amount"),
+};
+
 /*----- event listeners -----*/
 
 /*----- functions -----*/
-
 function buildDeck() {
   let deckOfCards = [];
 
@@ -118,4 +130,76 @@ function shuffleDeck() {
   }
 }
 
-shuffleDeck();
+function renderCards(hand, container, firstCardHidden) {
+  container.innerHTML = "";
+  hand.forEach((card, index) => {
+    const cardImg = document.createElement("img");
+    cardImg.src =
+      firstCardHidden && index === 0
+        ? "./cards/BACK.png"
+        : `./cards/${card.face}.png`;
+    container.appendChild(cardImg);
+  });
+}
+
+//To be called when it's time to reveal.
+function revealBankerFirstHiddenCard() {
+  gameState.firstCardHidden = false;
+  renderCards(deck.bankerHand, cardContainer.bankerCard, false);
+}
+
+function calculateTotalPoints(hand) {
+  let points = 0;
+  let numberOfAces = 0;
+
+  hand.forEach((card) => {
+    if (card.face.startsWith("A")) {
+      numberOfAces += 1;
+      points += 11;
+    } else {
+      points += card.point;
+    }
+  });
+
+  while (points > 21 && numberOfAces > 0) {
+    points -= 10;
+    numberOfAces -= 1;
+  }
+  return points;
+}
+
+function checkBlackJack() {
+  const playerPoints = calculateTotalPoints(deck.playerHand);
+  const bankerPoints = calculateTotalPoints(deck.bankerHand);
+
+  if (playerPoints === 21) {
+    gameState.playerBlackJack = true;
+    results.resultMessage.textContent = messages.playerBJ;
+  }
+
+  if (bankerPoints === 21) {
+    gameState.gameOver = true;
+    results.resultMessage.textContent = messages.bankerBJ;
+  }
+
+  results.playerPoints.textContent = playerPoints;
+  results.bankerPoints.textContent = bankerPoints;
+}
+
+function deal() {
+  shuffleDeck();
+
+  deck.bankerHand = [deck.shuffled.pop(), deck.shuffled.pop()];
+  deck.playerHand = [deck.shuffled.pop(), deck.shuffled.pop()];
+
+  renderCards(
+    deck.bankerHand,
+    cardContainer.bankerCard,
+    gameState.bankerFirstCardHidden
+  );
+  renderCards(deck.playerHand, cardContainer.playerCard, false);
+
+  checkBlackJack();
+}
+
+deal();
