@@ -37,11 +37,6 @@ const deck = {
   playerHand: [],
 };
 
-const handPoints = {
-  playerHP: [],
-  bankerHP: [],
-};
-
 const gameState = {
   gameOver: false,
   bankerFirstCardHidden: true,
@@ -98,6 +93,7 @@ const balanceAndBettingAmt = {
 };
 
 /*----- event listeners -----*/
+inGameChoices.hit.addEventListener("click", hitMe);
 
 /*----- functions -----*/
 function buildDeck() {
@@ -186,6 +182,70 @@ function checkBlackJack() {
   results.bankerPoints.textContent = bankerPoints;
 }
 
+function checkBanBan() {
+  if (deck.playerHand[0].point === 11 && deck.playerHand[1].point === 11) {
+    gameState.playerBanBan = true;
+    results.resultMessage.textContent = messages.playerBB;
+    gameState.gameOver = true;
+  }
+
+  if (
+    !gameState.gameOver &&
+    deck.bankerHand[0].point === 11 &&
+    deck.bankerHand[1].point === 11
+  ) {
+    gameState.gameOver = true;
+    results.resultMessage.textContent = messages.bankerBB;
+  }
+}
+
+function checkTrips7() {
+  if (
+    deck.playerHand.length === 3 &&
+    deck.playerHand[0].point === 7 &&
+    deck.playerHand[1].point === 7 &&
+    deck.playerHand[2].point === 7
+  ) {
+    gameState.playerTrips7 = true;
+    results.resultMessage.textContent = messages.player777;
+    gameState.gameOver = true;
+  }
+
+  if (
+    !gameState.gameOver &&
+    deck.bankerHand.length === 3 &&
+    deck.bankerHand[0].point === 7 &&
+    deck.bankerHand[1].point === 7 &&
+    deck.bankerHand[2].point === 7
+  ) {
+    gameState.gameOver = true;
+    results.resultMessage.textContent = messages.banker777;
+  }
+}
+
+function hitMe() {
+  deck.playerHand.push(deck.shuffled.pop());
+  renderCards(deck.playerHand, cardContainer.playerCard, false);
+
+  const playerPoints = calculateTotalPoints(deck.playerHand);
+  results.playerPoints.textContent = playerPoints;
+
+  if (playerPoints > 21) {
+    gameState.gameOver = true;
+    results.resultMessage.textContent = messages.lose;
+    revealBankerFirstHiddenAndPoints();
+  }
+}
+
+function revealBankerFirstHiddenAndPoints() {
+  if (gameState.bankerFirstCardHidden) {
+    revealBankerFirstHiddenCard();
+  }
+
+  const bankerPoints = calculateTotalPoints(deck.bankerHand);
+  results.bankerPoints.textContent = bankerPoints;
+}
+
 function deal() {
   shuffleDeck();
 
@@ -200,6 +260,8 @@ function deal() {
   renderCards(deck.playerHand, cardContainer.playerCard, false);
 
   checkBlackJack();
+  checkBanBan();
+  checkTrips7();
 }
 
 deal();
