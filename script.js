@@ -18,16 +18,17 @@ const values = [
 
 const messages = {
   win: "dollar dollar bill 💰.",
-  lose: "you win some, you lose some.",
-  playerBJ: "winner winner chicken dinner 🐤",
-  playerBB: "you have won x 3 bet.",
-  player777: "you have won x 7 bet.",
-  bankerBJ: "you have been served a nice warm 🍽️ of blackjack from the banker.",
-  bankerBB: "you have lost x 3 bet.",
-  banker777: "you have lost x 7 bet.",
-  insufficientBal: "insufficient balance.",
-  push: "good fight.",
-  cannotDeal: "min. bet to play is $5",
+  lose: "you win some, you lose some 😊.",
+  playerBJ: "winner winner chicken dinner 🐤.",
+  playerBB: "you have won x 3 bet 👏🏼.",
+  player777: "you have won x 7 bet 👏🏼.",
+  bankerBJ: "banker 🏦 natural blackjack 🤑.",
+  bankerBB: "you have lost x 3 bet 😭.",
+  banker777: "you have lost x 7 bet 😭.",
+  insufficientBal: "insufficient balance 🤔.",
+  push: "good fight 💪🏽.",
+  cannotDeal: "min. bet to play is $5 🤬.",
+  cannotStand: "min. points to stand is 16 🤬.",
 };
 
 /*----- state variables -----*/
@@ -138,9 +139,8 @@ function renderCards(hand, container, firstCardHidden) {
   });
 }
 
-//To be called when it's time to reveal.
 function revealBankerFirstHiddenCard() {
-  gameState.firstCardHidden = false;
+  gameState.bankerFirstCardHidden = false;
   renderCards(deck.bankerHand, cardContainer.bankerCard, false);
 }
 
