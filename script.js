@@ -49,6 +49,7 @@ const gameState = {
 const bettingInfo = {
   balance: 1000,
   betAmount: 0,
+  history: [],
 };
 
 /*----- cached elements  -----*/
@@ -96,7 +97,16 @@ const balanceAndBettingAmt = {
 /*----- event listeners -----*/
 inGameChoices.hit.addEventListener("click", hitMe);
 
-/*----- functions -----*/
+chips.bet5.addEventListener("click", () => bet(5));
+chips.bet10.addEventListener("click", () => bet(10));
+chips.bet25.addEventListener("click", () => bet(25));
+chips.bet50.addEventListener("click", () => bet(50));
+
+inputChoices.undo.addEventListener("click", undoPreviousBet);
+inputChoices.clear.addEventListener("click", clearBet);
+inputChoices.deal.addEventListener("click", startGame);
+
+/*----- inGame functions -----*/
 function buildDeck() {
   let deckOfCards = [];
 
@@ -265,3 +275,69 @@ function deal() {
 }
 
 deal();
+
+/*----- betting functions -----*/
+function bet(amount) {
+  if (bettingInfo.balance < amount) {
+    results.resultMessage.textContent = messages.insufficientBal;
+    return;
+  }
+  bettingInfo.balance -= amount;
+  bettingInfo.betAmount += amount;
+  bettingInfo.history.push(amount);
+  showBet();
+}
+
+function showBet() {
+  balanceAndBettingAmt.balanceAmount.textContent = bettingInfo.balance;
+  balanceAndBettingAmt.bettingAmount.textContent = bettingInfo.betAmount;
+}
+
+function undoPreviousBet() {
+  const previousBetAmount = bettingInfo.history.pop();
+  bettingInfo.balance += previousBetAmount;
+  bettingInfo.betAmount -= previousBetAmount;
+  showBet();
+}
+
+function clearBet() {
+  bettingInfo.balance += bettingInfo.betAmount;
+  bettingInfo.betAmount = 0;
+  showBet();
+}
+
+function updateWinnings(numberOfTimes) {
+  const winAmount = bettingInfo.betAmount * numberOfTimes;
+  bettingInfo.balance += winAmount;
+  showBet();
+}
+
+function updateLosses(numberOfTimes) {
+  const lossAmount = bettingInfo.betAmount * numberOfTimes;
+  bettingInfo.balance -= lossAmount;
+  bettingInfo.balance -= lossAmount;
+  showBet();
+}
+
+function updateNoLosses() {
+  bettingInfo.balance += bettingInfo.betAmount;
+  bettingInfo.betAmount = 0;
+  showBet();
+}
+
+function startGame() {
+  if (bettingInfo.betAmount < 5) {
+    results.resultMessage.textContent = messages.cannotDeal;
+    return;
+  }
+  deal();
+
+  chips.bet5.disabled = true;
+  chips.bet10.disabled = true;
+  chips.bet25.disabled = true;
+  chips.bet50.disabled = true;
+
+  inputChoices.undo.disabled = true;
+  inputChoices.clear.disabled = true;
+  inputChoices.deal.disabled = true;
+}
