@@ -382,15 +382,17 @@ function deal() {
 }
 
 /*----- betting functions -----*/
+
 function bet(amount) {
-  if (bettingInfo.balance < amount) {
+  if (bettingInfo.balance >= amount) {
+    bettingInfo.balance -= amount;
+    bettingInfo.betAmount += amount;
+    bettingInfo.history.push(amount);
+    showBet();
+    inputChoices.undo.disabled = false;
+  } else {
     results.resultMessage.textContent = messages.insufficientBal;
-    return;
   }
-  bettingInfo.balance -= amount;
-  bettingInfo.betAmount += amount;
-  bettingInfo.history.push(amount);
-  showBet();
 }
 
 function showBet() {
@@ -399,9 +401,14 @@ function showBet() {
 }
 
 function undoPreviousBet() {
-  const previousBetAmount = bettingInfo.history.pop();
-  bettingInfo.balance += previousBetAmount;
-  bettingInfo.betAmount -= previousBetAmount;
+  if (bettingInfo.history.length > 0) {
+    const previousBetAmount = bettingInfo.history.pop();
+    bettingInfo.balance += previousBetAmount;
+    bettingInfo.betAmount -= previousBetAmount;
+    inputChoices.undo.disabled = false;
+  } else {
+    inputChoices.undo.disabled = true;
+  }
   showBet();
 }
 
@@ -436,6 +443,8 @@ function startGame() {
     return;
   }
   deal();
+
+  results.resultMessage.textContent = "";
 
   chips.bet5.disabled = true;
   chips.bet10.disabled = true;
