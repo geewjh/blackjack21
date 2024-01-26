@@ -17,18 +17,18 @@ const values = [
 ];
 
 const messages = {
-  win: "dollar dollar bill 💰.",
-  lose: "you win some, you lose some 😊.",
-  playerBJ: "winner winner chicken dinner 🐤.",
-  playerBB: "you have won x 3 bet 👏🏼.",
-  player777: "you have won x 7 bet 👏🏼.",
-  bankerBJ: "banker 🏦 natural blackjack 🤑.",
-  bankerBB: "you have lost x 3 bet 😭.",
-  banker777: "you have lost x 7 bet 😭.",
-  insufficientBal: "insufficient balance 🤔.",
-  push: "good fight 💪🏽.",
-  cannotDeal: "min. bet to play is $5 🤬.",
-  cannotStand: "min. points to stand is 16 🤬.",
+  win: "dollar dollar bill 💰",
+  lose: "you win some, you lose some 😊",
+  playerBJ: "winner winner chicken dinner 🐤",
+  playerBB: "you have won x 3 bet 👏🏼",
+  player777: "you have won x 7 bet 👏🏼",
+  bankerBJ: "banker 🏦 natural blackjack 🤑",
+  bankerBB: "you have lost x 3 bet 😭",
+  banker777: "you have lost x 7 bet 😭",
+  insufficientBal: "insufficient balance 🤔",
+  push: "good fight 💪🏽",
+  cannotDeal: "min. bet to play is $5 🤬",
+  cannotStand: "min. points to stand is 16 🤬",
 };
 
 /*----- state variables -----*/
@@ -60,8 +60,8 @@ const results = {
 };
 
 const points = {
-  banker: document.querySelector("#banker-points-container"),
-  player: document.querySelector("#player-points-container"),
+  banker: document.querySelector(".banker-points-container"),
+  player: document.querySelector(".player-points-container"),
 };
 
 const chips = {
@@ -95,6 +95,7 @@ const balanceAndBettingAmt = {
 };
 
 /*----- event listeners -----*/
+// inGameChoices.double.addEventListener("click", double);
 inGameChoices.hit.addEventListener("click", hitMe);
 inGameChoices.stand.addEventListener("click", stand);
 inGameChoices.run.addEventListener("click", zao);
@@ -109,6 +110,27 @@ inputChoices.clear.addEventListener("click", clearBet);
 inputChoices.deal.addEventListener("click", startGame);
 
 /*----- inGame functions -----*/
+init();
+
+function init() {
+  deck.shuffled = [];
+  deck.bankerHand = [];
+  deck.playerHand = [];
+  gameState.gameOver = false;
+  gameState.bankerFirstCardHidden = true;
+  gameState.playerBlackJack = false;
+  gameState.playerBanBan = false;
+  gameState.playerTrips7 = false;
+  bettingInfo.balance = 1000;
+  bettingInfo.betAmount = 0;
+  bettingInfo.history = [];
+  deal();
+  hideInGameChoices("none");
+  hideBankerAndPlayerPoints("none");
+  hideStarting4Cards("none");
+  welcomeMessageandInstruction();
+}
+
 function buildDeck() {
   let deckOfCards = [];
 
@@ -177,19 +199,25 @@ function checkBlackJack() {
 
   if (playerPoints === 21) {
     gameState.playerBlackJack = true;
+    gameState.gameOver = true;
     results.resultMessage.textContent = messages.playerBJ;
     results.playerPoints.textContent = "blackjack";
-    updateWinnings(2);
+    updateWinnings(3);
+    setTimeout(nextRound, 5000);
   } else {
     results.playerPoints.textContent = playerPoints;
   }
 
-  if (bankerPoints === 21) {
+  if (bankerPoints === 21 && playerPoints === 15) {
+    revealBankerFirstHiddenCard();
+    results.resultMessage.textContent = "great escape 🎢";
+    updateNoLosses();
+    setTimeout(nextRound, 5000);
+  } else if (bankerPoints === 21 && playerPoints !== 15) {
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.bankerBJ;
-    results.bankerPoints.textContent = "blackjack";
-    revealBankerFirstHiddenCard();
-    updateLosses(2);
+    updateLosses(1);
+    setTimeout(nextRound, 5000);
   } else {
     results.bankerPoints.textContent = "?";
   }
@@ -201,19 +229,17 @@ function checkBanBan() {
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.playerBB;
     results.playerPoints.textContent = "ban ban";
-    updateWinnings(3);
+    updateWinnings(4);
+    setTimeout(nextRound, 5000);
   }
 
-  if (
-    !gameState.gameOver &&
-    deck.bankerHand[0].point === 11 &&
-    deck.bankerHand[1].point === 11
-  ) {
+  if (deck.bankerHand[0].point === 11 && deck.bankerHand[1].point === 11) {
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.bankerBB;
     results.bankerPoints.textContent = "ban ban";
     revealBankerFirstHiddenCard();
     updateLosses(3);
+    setTimeout(nextRound, 5000);
   }
 }
 
@@ -228,11 +254,11 @@ function checkTrips7() {
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.player777;
     results.playerPoints.textContent = "triple 7";
-    updateWinnings(7);
+    updateWinnings(8);
+    setTimeout(nextRound, 5000);
   }
 
   if (
-    !gameState.gameOver &&
     deck.bankerHand.length === 3 &&
     deck.bankerHand[0].point === 7 &&
     deck.bankerHand[1].point === 7 &&
@@ -242,12 +268,14 @@ function checkTrips7() {
     results.resultMessage.textContent = messages.banker777;
     results.bankerPoints.textContent = "triple 7";
     updateLosses(7);
+    setTimeout(nextRound, 5000);
   }
 }
 
 function hitMe() {
   deck.playerHand.push(deck.shuffled.pop());
   renderCards(deck.playerHand, cardContainer.playerCard, false);
+  checkTrips7();
 
   const playerPoints = calculateTotalPoints(deck.playerHand);
   results.playerPoints.textContent = playerPoints;
@@ -267,17 +295,46 @@ function hitMe() {
 
     if (bankerPoints > 21) {
       results.resultMessage.textContent = messages.push;
+      updateNoLosses();
+      disableInGameChoices();
+      setTimeout(nextRound, 5000);
     } else {
       results.resultMessage.textContent = messages.lose;
-      updateLosses(1);
+      updateLossesForHit();
+      disableInGameChoices();
+      revealBankerFirstHiddenAndPoints();
+      setTimeout(nextRound, 5000);
     }
-
-    revealBankerFirstHiddenAndPoints();
-    gameState.gameOver = true;
-    inGameChoices.hit.disabled = true;
-    inGameChoices.run.disabled = true;
-    inGameChoices.stand.disabled = true;
   }
+}
+
+function nextRound() {
+  gameState.gameOver = false;
+  deck.playerHand = [];
+  deck.bankerHand = [];
+  gameState.bankerFirstCardHidden = true;
+  shuffleDeck();
+  hideInGameChoices("none");
+  hideBankerAndPlayerPoints("none");
+  hideStarting4Cards("none");
+  revertErrorMessage();
+  hideChips("");
+  revealInputChoices();
+  enableInGameChoices();
+}
+
+function disableInGameChoices() {
+  inGameChoices.double.disabled = true;
+  inGameChoices.hit.disabled = true;
+  inGameChoices.stand.disabled = true;
+  inGameChoices.run.disabled = true;
+}
+
+function enableInGameChoices() {
+  inGameChoices.double.disabled = false;
+  inGameChoices.hit.disabled = false;
+  inGameChoices.stand.disabled = false;
+  inGameChoices.run.disabled = false;
 }
 
 function revealBankerFirstHiddenCard() {
@@ -311,7 +368,6 @@ function stand() {
 
   revealBankerFirstHiddenCard();
   whoWins();
-  gameState.gameOver = true;
 }
 
 function whoWins() {
@@ -320,16 +376,24 @@ function whoWins() {
 
   if (playerPoints > 21) {
     results.resultMessage.textContent = messages.lose;
-    updateLosses(1);
+    updateLossesForHit();
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
   } else if (bankerPoints > 21 || playerPoints > bankerPoints) {
     results.resultMessage.textContent = messages.win;
-    updateWinnings(1);
+    updateWinnings(2);
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
   } else if (playerPoints < bankerPoints) {
     results.resultMessage.textContent = messages.lose;
-    updateLosses(1);
+    updateLossesForHit();
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
   } else {
     results.resultMessage.textContent = messages.push;
     updateNoLosses();
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
   }
 
   results.playerPoints.textContent = playerPoints;
@@ -340,28 +404,33 @@ function zao() {
   const playerPoints = calculateTotalPoints(deck.playerHand);
 
   if (deck.playerHand.length === 2 && playerPoints === 15) {
-    restart();
+    results.resultMessage.textContent = messages.push;
+    updateNoLosses();
+    setTimeout(nextRound, 5000);
   } else {
-    results.resultMessage.textContent = `There's no backing out now. Keep playing! 😅`;
+    results.resultMessage.textContent =
+      "There's no backing out now. Keep playing! 😅";
   }
 }
 
-function restart() {
-  deck.bankerHand = [];
-  deck.playerHand = [];
+// function double() {
+//   if (bettingInfo.balance < bettingInfo.betAmount) {
+//     results.resultMessage.textContent = "You're too broke to double down! 😓";
+//     return;
+//   }
 
-  gameState.gameOver = false;
-  gameState.bankerFirstCardHidden = true;
-  gameState.playerBlackJack = false;
-  gameState.playerBanBan = false;
-  gameState.playerTrips7 = false;
+//   bettingInfo.balance -= bettingInfo.betAmount;
+//   bettingInfo.betAmount *= 2;
+//   showBet();
 
-  results.playerPoints.textContent = "";
-  results.playerPoints.textContent = "";
-  results.resultMessage.textContent = "";
+//   deck.playerHand.push(deck.shuffled.pop());
+//   renderCards(deck.playerHand, cardContainer.playerCard, false);
 
-  deal();
-}
+//   const playerPoints = calculateTotalPoints(deck.playerHand);
+//   results.playerPoints.textContent = playerPoints;
+
+//   stand();
+// }
 
 function deal() {
   shuffleDeck();
@@ -376,9 +445,12 @@ function deal() {
   );
   renderCards(deck.playerHand, cardContainer.playerCard, false);
 
+  const playerPoints = calculateTotalPoints(deck.playerHand);
+  results.playerPoints.textContent = playerPoints;
+  results.bankerPoints.textContent = "?";
+
   checkBlackJack();
   checkBanBan();
-  checkTrips7();
 }
 
 /*----- betting functions -----*/
@@ -389,8 +461,8 @@ function bet(amount) {
     bettingInfo.betAmount += amount;
     bettingInfo.history.push(amount);
     showBet();
-    inputChoices.undo.disabled = false;
   } else {
+    results.resultMessage.style.marginTop = "280px";
     results.resultMessage.textContent = messages.insufficientBal;
   }
 }
@@ -401,15 +473,12 @@ function showBet() {
 }
 
 function undoPreviousBet() {
-  if (bettingInfo.history.length > 0) {
+  if (bettingInfo.history.length > 0 && bettingInfo.betAmount > 0) {
     const previousBetAmount = bettingInfo.history.pop();
     bettingInfo.balance += previousBetAmount;
     bettingInfo.betAmount -= previousBetAmount;
-    inputChoices.undo.disabled = false;
-  } else {
-    inputChoices.undo.disabled = true;
+    showBet();
   }
-  showBet();
 }
 
 function clearBet() {
@@ -421,13 +490,19 @@ function clearBet() {
 function updateWinnings(numberOfTimes) {
   const winAmount = bettingInfo.betAmount * numberOfTimes;
   bettingInfo.balance += winAmount;
+  bettingInfo.betAmount = 0;
   showBet();
 }
 
 function updateLosses(numberOfTimes) {
   const lossAmount = bettingInfo.betAmount * numberOfTimes;
   bettingInfo.balance -= lossAmount;
-  bettingInfo.balance -= lossAmount;
+  bettingInfo.betAmount = 0;
+  showBet();
+}
+
+function updateLossesForHit() {
+  bettingInfo.betAmount = 0;
   showBet();
 }
 
@@ -437,21 +512,84 @@ function updateNoLosses() {
   showBet();
 }
 
+function hideInGameChoices(displayStyle) {
+  for (const key in inGameChoices) {
+    if (inGameChoices.hasOwnProperty(key)) {
+      inGameChoices[key].style.display = displayStyle;
+    }
+  }
+}
+
+function hideStarting4Cards(displayStyle) {
+  let cards = [cardContainer.playerCard, cardContainer.bankerCard];
+
+  for (let i = 0; i < cards.length; i++) {
+    cards[i].style.display = displayStyle;
+  }
+}
+
+function hideBankerAndPlayerPoints(displayStyle) {
+  let pointsElToHide = [points.banker, points.player];
+
+  pointsElToHide.forEach((el) => {
+    el.style.display = displayStyle;
+  });
+}
+
+function hideChips(displayStyle) {
+  for (const key in chips) {
+    if (chips.hasOwnProperty(key)) {
+      chips[key].style.display = displayStyle;
+    }
+  }
+}
+
+function hideStarting4Cards(displayStyle) {
+  let cards = [cardContainer.playerCard, cardContainer.bankerCard];
+
+  for (let i = 0; i < cards.length; i++) {
+    cards[i].style.display = displayStyle;
+  }
+}
+
+function hideInputChoices() {
+  inputChoices.undo.style.display = "none";
+  inputChoices.clear.style.display = "none";
+  inputChoices.deal.style.display = "none";
+}
+
+function revealInputChoices() {
+  inputChoices.undo.style.display = "";
+  inputChoices.clear.style.display = "";
+  inputChoices.deal.style.display = "";
+}
+
+function displayAndCenterErrorMessage() {
+  results.resultMessage.style.marginTop = "280px";
+  results.resultMessage.textContent = messages.cannotDeal;
+}
+
+function revertErrorMessage() {
+  results.resultMessage.textContent = "";
+  results.resultMessage.style.marginTop = "0px";
+}
+
+function welcomeMessageandInstruction() {
+  results.resultMessage.style.marginTop = "280px";
+  results.resultMessage.textContent =
+    "welcome to the world of 🌍 blackjack, please place a bet amount of at least $5 💵.";
+}
+
 function startGame() {
   if (bettingInfo.betAmount < 5) {
-    results.resultMessage.textContent = messages.cannotDeal;
+    displayAndCenterErrorMessage();
     return;
   }
   deal();
-
-  results.resultMessage.textContent = "";
-
-  chips.bet5.disabled = true;
-  chips.bet10.disabled = true;
-  chips.bet25.disabled = true;
-  chips.bet50.disabled = true;
-
-  inputChoices.undo.disabled = true;
-  inputChoices.clear.disabled = true;
-  inputChoices.deal.disabled = true;
+  hideInGameChoices("");
+  hideBankerAndPlayerPoints("");
+  hideStarting4Cards("");
+  revertErrorMessage();
+  hideChips("none");
+  hideInputChoices();
 }
