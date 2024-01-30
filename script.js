@@ -198,16 +198,24 @@ function checkBlackJack() {
   const bankerPoints = calculateTotalPoints(deck.bankerHand);
 
   if (playerPoints === 21 && bankerPoints !== 21) {
+    revealBankerFirstHiddenCard();
     gameState.playerBlackJack = true;
     gameState.gameOver = true;
-    results.resultMessage.textContent = messages.playerBJ;
-    results.playerPoints.textContent = "blackjack";
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = messages.playerBJ;
+      results.bankerPoints.textContent = bankerPoints;
+      results.playerPoints.textContent = "blackjack";
+    });
     updateWinnings(3);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
   } else if (bankerPoints === 21 && playerPoints === 15) {
     revealBankerFirstHiddenCard();
-    results.resultMessage.textContent = "great escape 🎢";
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = "heng ah, zao! 🏃";
+      results.bankerPoints.textContent = "blackjack";
+      results.playerPoints.textContent = playerPoints;
+    });
     updateNoLosses();
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -218,29 +226,28 @@ function checkBlackJack() {
   ) {
     revealBankerFirstHiddenCard();
     gameState.gameOver = true;
-    results.resultMessage.textContent = messages.bankerBJ;
-    results.bankerPoints.textContent = "blackjack";
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = messages.bankerBJ;
+      results.bankerPoints.textContent = "blackjack";
+      results.playerPoints.textContent = playerPoints;
+    });
     updateLosses(1);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
   } else if (bankerPoints === 21 && playerPoints === 21) {
     revealBankerFirstHiddenCard();
     gameState.gameOver = true;
-    results.resultMessage.textContent = messages.push;
-    results.bankerPoints.textContent = "Both blackjack";
-    results.playerPoints.textContent = "Both blackjack";
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = messages.push;
+      results.bankerPoints.textContent = "blackjack";
+      results.playerPoints.textContent = "blackjack";
+    });
     updateNoLosses();
     disableInGameChoices();
     setTimeout(nextRound, 5000);
   } else {
     results.bankerPoints.textContent = "?";
     results.playerPoints.textContent = playerPoints;
-  }
-
-  if (playerPoints < 16) {
-    inGameChoices.double.style.display = "none";
-  } else {
-    inGameChoices.double.style.display = "";
   }
 }
 
@@ -249,26 +256,49 @@ function checkBanBan() {
   const bankerPoints = calculateTotalPoints(deck.bankerHand);
 
   if (
+    deck.bankerHand[0].point === 11 &&
+    deck.bankerHand[1].point === 11 &&
+    deck.playerHand[0].point === 11 &&
+    deck.playerHand[1].point === 11
+  ) {
+    revealBankerFirstHiddenCard();
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = messages.push;
+      results.bankerPoints.textContent = "ban ban";
+      results.playerPoints.textContent = "ban ban";
+    });
+    updateNoLosses();
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else if (
     deck.playerHand[0].point === 11 &&
     deck.playerHand[1].point === 11 &&
     bankerPoints !== 21
   ) {
+    revealBankerFirstHiddenCard();
     gameState.playerBanBan = true;
     gameState.gameOver = true;
-    results.resultMessage.textContent = messages.playerBB;
-    results.playerPoints.textContent = "ban ban";
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = messages.playerBB;
+      results.bankerPoints.textContent = bankerPoints;
+      results.playerPoints.textContent = "ban ban";
+    });
     updateWinnings(4);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
   } else if (
     deck.bankerHand[0].point === 11 &&
     deck.bankerHand[1].point === 11 &&
-    playerPoints !== 21
+    playerPoints !== 21 &&
+    playerPoints !== 15
   ) {
-    gameState.gameOver = true;
-    results.resultMessage.textContent = messages.bankerBB;
-    results.bankerPoints.textContent = "ban ban";
     revealBankerFirstHiddenCard();
+    gameState.gameOver = true;
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = messages.bankerBB;
+      results.bankerPoints.textContent = "ban ban";
+      results.playerPoints.textContent = playerPoints;
+    });
     updateLosses(2);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -278,30 +308,17 @@ function checkBanBan() {
     playerPoints === 15
   ) {
     revealBankerFirstHiddenCard();
-    results.resultMessage.textContent = "great escape 🎢";
-    updateNoLosses();
-    disableInGameChoices();
-    setTimeout(nextRound, 5000);
-  } else if (
-    deck.bankerHand[0].point === 11 &&
-    deck.bankerHand[1].point === 11 &&
-    deck.playerHand[0].point === 11 &&
-    deck.playerHand[1].point === 11
-  ) {
-    revealBankerFirstHiddenCard();
-    results.resultMessage.textContent = messages.push;
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = "heng ah, zao! 🏃";
+      results.bankerPoints.textContent = "ban ban";
+      results.playerPoints.textContent = playerPoints;
+    });
     updateNoLosses();
     disableInGameChoices();
     setTimeout(nextRound, 5000);
   } else {
     results.bankerPoints.textContent = "?";
     results.playerPoints.textContent = playerPoints;
-  }
-
-  if (playerPoints < 16) {
-    inGameChoices.double.style.display = "none";
-  } else {
-    inGameChoices.double.style.display = "";
   }
 }
 
@@ -389,9 +406,9 @@ function nextRound() {
 }
 
 function disableChips() {
-  for (const chip in chips) {
-    if (chips.hasOwnProperty(chipKey)) {
-      chips[chip].disabled = true;
+  for (const key in chips) {
+    if (chips.hasOwnProperty(key)) {
+      chips[key].disabled = true;
     }
   }
 }
@@ -431,6 +448,8 @@ function revealBankerFirstHiddenAndPoints() {
 }
 
 function stand() {
+  checkTrips7();
+
   const playerPoints = calculateTotalPoints(deck.playerHand);
   let bankerPoints = calculateTotalPoints(deck.bankerHand);
 
@@ -438,6 +457,21 @@ function stand() {
     results.resultMessage.textContent = messages.cannotStand;
     return;
   }
+
+  while (bankerPoints < 16) {
+    deck.bankerHand.push(deck.shuffled.pop());
+    renderCards(deck.bankerHand, cardContainer.bankerCard, false);
+    bankerPoints = calculateTotalPoints(deck.bankerHand);
+  }
+
+  revealBankerFirstHiddenAndPoints();
+  whoWins();
+}
+
+function standForDouble() {
+  checkTrips7();
+
+  let bankerPoints = calculateTotalPoints(deck.bankerHand);
 
   while (bankerPoints < 16) {
     deck.bankerHand.push(deck.shuffled.pop());
@@ -509,7 +543,7 @@ function double() {
   const playerPoints = calculateTotalPoints(deck.playerHand);
   results.playerPoints.textContent = playerPoints;
 
-  stand();
+  standForDouble();
 }
 
 function deal() {
@@ -674,7 +708,7 @@ function startGame() {
 function checkForBrokeInstances() {
   if (bettingInfo.balance <= 0) {
     let playAgain = confirm(
-      "Nearest ATM 🏦 is just across the street. If your balance is negative, make sure to clear your debt with Ah Huat 👴🏼 first!"
+      "Thank you for playing. If your balance is negative, make sure to clear your debt with Ah Huat 👴🏼 first!"
     );
     if (playAgain) {
       bettingInfo.balance = 1000;
@@ -687,7 +721,27 @@ function checkForBrokeInstances() {
         "Thank you for playing. If your balance is negative, remember to clear your debt with Ah Huat 👴🏼 first, before refreshing the page to play again.";
       disableInGameChoices();
       disableChips();
-      disableInputChoices;
+      disableInputChoices();
     }
   }
 }
+
+//Testing
+
+// function testforBanBan() {
+//   deck.playerHand = [
+//     { face: "10-C", point: 10 },
+//     { face: "6-H", point: 6 },
+//   ];
+//   deck.bankerHand = [
+//     { face: "A-C", point: 11 },
+//     { face: "A-D", point: 11 },
+//   ];
+
+//   renderCards(
+//     deck.bankerHand,
+//     cardContainer.bankerCard,
+//     gameState.bankerFirstCardHidden
+//   );
+//   renderCards(deck.playerHand, cardContainer.playerCard, false);
+// }
