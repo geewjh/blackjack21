@@ -193,6 +193,45 @@ function calculateTotalPoints(hand) {
   return points;
 }
 
+function checkBlackJackAndBanBan() {
+  const playerPoints = calculateTotalPoints(deck.playerHand);
+  const bankerPoints = calculateTotalPoints(deck.bankerHand);
+
+  if (
+    deck.bankerHand[0].point === 11 &&
+    deck.bankerHand[1].point === 11 &&
+    playerPoints === 21
+  ) {
+    revealBankerFirstHiddenCard();
+    gameState.gameOver = true;
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = messages.lose;
+      results.bankerPoints.textContent = "ban ban";
+      results.playerPoints.textContent = "blackjack";
+    });
+    updateLossesForHit();
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else if (
+    bankerPoints === 21 &&
+    deck.playerHand[0].point === 11 &&
+    deck.playerHand[1].point === 11
+  ) {
+    revealBankerFirstHiddenCard();
+    requestAnimationFrame(() => {
+      results.resultMessage.textContent = messages.win;
+      results.bankerPoints.textContent = "blackjack";
+      results.playerPoints.textContent = "ban ban";
+    });
+    updateWinnings(2);
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else {
+    results.bankerPoints.textContent = "?";
+    results.playerPoints.textContent = playerPoints;
+  }
+}
+
 function checkBlackJack() {
   const playerPoints = calculateTotalPoints(deck.playerHand);
   const bankerPoints = calculateTotalPoints(deck.bankerHand);
@@ -652,14 +691,6 @@ function hideChips(displayStyle) {
   }
 }
 
-function hideStarting4Cards(displayStyle) {
-  let cards = [cardContainer.playerCard, cardContainer.bankerCard];
-
-  for (let i = 0; i < cards.length; i++) {
-    cards[i].style.display = displayStyle;
-  }
-}
-
 function hideInputChoices() {
   inputChoices.undo.style.display = "none";
   inputChoices.clear.style.display = "none";
@@ -701,6 +732,7 @@ function startGame() {
   hideChips("none");
   hideInputChoices();
 
+  checkBlackJackAndBanBan();
   checkBlackJack();
   checkBanBan();
 }
