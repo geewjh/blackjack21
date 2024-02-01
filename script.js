@@ -152,7 +152,7 @@ function buildDeck() {
 }
 
 function shuffleDeck() {
-  deckOfCards = buildDeck();
+  let deckOfCards = buildDeck();
 
   while (deckOfCards.length > 0) {
     const randomIndex = Math.floor(Math.random() * deckOfCards.length);
@@ -204,12 +204,10 @@ function checkBlackJackAndBanBan() {
   ) {
     revealBankerFirstHiddenCard();
     gameState.gameOver = true;
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = messages.lose;
-      results.bankerPoints.textContent = "ban ban";
-      results.playerPoints.textContent = "blackjack";
-    });
-    updateLossesForHit();
+    results.resultMessage.textContent = messages.lose;
+    results.bankerPoints.textContent = "ban ban";
+    results.playerPoints.textContent = "blackjack";
+    updateLosses(0);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
   } else if (
@@ -218,11 +216,10 @@ function checkBlackJackAndBanBan() {
     deck.playerHand[1].point === 11
   ) {
     revealBankerFirstHiddenCard();
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = messages.win;
-      results.bankerPoints.textContent = "blackjack";
-      results.playerPoints.textContent = "ban ban";
-    });
+    gameState.gameOver = true;
+    results.resultMessage.textContent = messages.win;
+    results.bankerPoints.textContent = "blackjack";
+    results.playerPoints.textContent = "ban ban";
     updateWinnings(2);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -240,21 +237,18 @@ function checkBlackJack() {
     revealBankerFirstHiddenCard();
     gameState.playerBlackJack = true;
     gameState.gameOver = true;
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = messages.playerBJ;
-      results.bankerPoints.textContent = bankerPoints;
-      results.playerPoints.textContent = "blackjack";
-    });
+    results.resultMessage.textContent = messages.playerBJ;
+    results.bankerPoints.textContent = bankerPoints;
+    results.playerPoints.textContent = "blackjack";
     updateWinnings(3);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
   } else if (bankerPoints === 21 && playerPoints === 15) {
     revealBankerFirstHiddenCard();
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = "heng ah, zao! 🏃";
-      results.bankerPoints.textContent = "blackjack";
-      results.playerPoints.textContent = playerPoints;
-    });
+    gameState.gameOver = true;
+    results.resultMessage.textContent = "heng ah, zao! 🏃";
+    results.bankerPoints.textContent = "blackjack";
+    results.playerPoints.textContent = playerPoints;
     updateNoLosses();
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -265,22 +259,19 @@ function checkBlackJack() {
   ) {
     revealBankerFirstHiddenCard();
     gameState.gameOver = true;
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = messages.bankerBJ;
-      results.bankerPoints.textContent = "blackjack";
-      results.playerPoints.textContent = playerPoints;
-    });
+    results.resultMessage.textContent = messages.bankerBJ;
+    results.bankerPoints.textContent = "blackjack";
+    results.playerPoints.textContent = playerPoints;
     updateLosses(1);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
   } else if (bankerPoints === 21 && playerPoints === 21) {
     revealBankerFirstHiddenCard();
     gameState.gameOver = true;
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = messages.push;
-      results.bankerPoints.textContent = "blackjack";
-      results.playerPoints.textContent = "blackjack";
-    });
+    gameState.playerBlackJack = true;
+    results.resultMessage.textContent = messages.push;
+    results.bankerPoints.textContent = "blackjack";
+    results.playerPoints.textContent = "blackjack";
     updateNoLosses();
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -301,11 +292,11 @@ function checkBanBan() {
     deck.playerHand[1].point === 11
   ) {
     revealBankerFirstHiddenCard();
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = messages.push;
-      results.bankerPoints.textContent = "ban ban";
-      results.playerPoints.textContent = "ban ban";
-    });
+    gameState.playerBanBan = true;
+    gameState.gameOver = true;
+    results.resultMessage.textContent = messages.push;
+    results.bankerPoints.textContent = "ban ban";
+    results.playerPoints.textContent = "ban ban";
     updateNoLosses();
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -317,11 +308,9 @@ function checkBanBan() {
     revealBankerFirstHiddenCard();
     gameState.playerBanBan = true;
     gameState.gameOver = true;
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = messages.playerBB;
-      results.bankerPoints.textContent = bankerPoints;
-      results.playerPoints.textContent = "ban ban";
-    });
+    results.resultMessage.textContent = messages.playerBB;
+    results.bankerPoints.textContent = bankerPoints;
+    results.playerPoints.textContent = "ban ban";
     updateWinnings(4);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -333,11 +322,9 @@ function checkBanBan() {
   ) {
     revealBankerFirstHiddenCard();
     gameState.gameOver = true;
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = messages.bankerBB;
-      results.bankerPoints.textContent = "ban ban";
-      results.playerPoints.textContent = playerPoints;
-    });
+    results.resultMessage.textContent = messages.bankerBB;
+    results.bankerPoints.textContent = "ban ban";
+    results.playerPoints.textContent = playerPoints;
     updateLosses(2);
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -347,11 +334,10 @@ function checkBanBan() {
     playerPoints === 15
   ) {
     revealBankerFirstHiddenCard();
-    requestAnimationFrame(() => {
-      results.resultMessage.textContent = "heng ah, zao! 🏃";
-      results.bankerPoints.textContent = "ban ban";
-      results.playerPoints.textContent = playerPoints;
-    });
+    gameState.gameOver = true;
+    results.resultMessage.textContent = "heng ah, zao! 🏃";
+    results.bankerPoints.textContent = "ban ban";
+    results.playerPoints.textContent = playerPoints;
     updateNoLosses();
     disableInGameChoices();
     setTimeout(nextRound, 5000);
@@ -371,7 +357,8 @@ function checkTrips7() {
     gameState.playerTrips7 = true;
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.player777;
-    results.playerPoints.textContent = "triple 7";
+    results.playerPoints.textContent = "trips 7";
+    disableInGameChoices();
     updateWinnings(8);
     setTimeout(nextRound, 5000);
   } else if (
@@ -380,9 +367,11 @@ function checkTrips7() {
     deck.bankerHand[1].point === 7 &&
     deck.bankerHand[2].point === 7
   ) {
+    revealBankerFirstHiddenCard();
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.banker777;
-    results.bankerPoints.textContent = "triple 7";
+    results.bankerPoints.textContent = "trips 7";
+    disableInGameChoices();
     updateLosses(6);
     setTimeout(nextRound, 5000);
   }
@@ -392,7 +381,6 @@ function hitMe() {
   inGameChoices.double.disabled = true;
   deck.playerHand.push(deck.shuffled.pop());
   renderCards(deck.playerHand, cardContainer.playerCard, false);
-  checkTrips7();
 
   const playerPoints = calculateTotalPoints(deck.playerHand);
   results.playerPoints.textContent = playerPoints;
@@ -402,30 +390,171 @@ function hitMe() {
 
     while (bankerPoints < 16) {
       deck.bankerHand.push(deck.shuffled.pop());
-      renderCards(
-        deck.bankerHand,
-        cardContainer.bankerCard,
-        gameState.bankerFirstCardHidden
-      );
+      renderCards(deck.bankerHand, cardContainer.bankerCard, false);
+      checkTrips7();
       bankerPoints = calculateTotalPoints(deck.bankerHand);
+      results.bankerPoints.textContent = bankerPoints;
     }
 
-    if (bankerPoints > 21) {
+    if (bankerPoints > 21 && playerPoints > 21) {
+      revealBankerFirstHiddenCard();
+      gameState.gameOver = true;
       results.resultMessage.textContent = messages.push;
+      results.bankerPoints.textContent = bankerPoints;
       results.playerPoints.textContent = playerPoints;
-      revealBankerFirstHiddenAndPoints();
       updateNoLosses();
       disableInGameChoices();
       setTimeout(nextRound, 5000);
-    } else {
+    } else if (bankerPoints <= 21) {
+      revealBankerFirstHiddenCard();
+      gameState.gameOver = true;
       results.resultMessage.textContent = messages.lose;
+      results.bankerPoints.textContent = bankerPoints;
       results.playerPoints.textContent = playerPoints;
-      updateLossesForHit();
+      updateLosses(0);
       disableInGameChoices();
-      revealBankerFirstHiddenAndPoints();
       setTimeout(nextRound, 5000);
     }
   }
+}
+
+function stand() {
+  const playerPoints = calculateTotalPoints(deck.playerHand);
+  let bankerPoints = calculateTotalPoints(deck.bankerHand);
+
+  if (playerPoints < 16) {
+    results.resultMessage.textContent = messages.cannotStand;
+    return;
+  }
+
+  while (bankerPoints < 16) {
+    deck.bankerHand.push(deck.shuffled.pop());
+    renderCards(deck.bankerHand, cardContainer.bankerCard, false);
+    checkTrips7();
+    bankerPoints = calculateTotalPoints(deck.bankerHand);
+  }
+
+  whoWins();
+}
+
+function double() {
+  if (bettingInfo.balance < bettingInfo.betAmount) {
+    results.resultMessage.textContent = "You're too broke to double down! 😓";
+    return;
+  } else {
+    bettingInfo.balance -= bettingInfo.betAmount;
+    bettingInfo.betAmount += bettingInfo.betAmount;
+    showBet();
+  }
+
+  deck.playerHand.push(deck.shuffled.pop());
+  renderCards(deck.playerHand, cardContainer.playerCard, false);
+  checkTrips7();
+
+  standForDouble();
+}
+
+function standForDouble() {
+  let bankerPoints = calculateTotalPoints(deck.bankerHand);
+
+  while (bankerPoints < 16) {
+    deck.bankerHand.push(deck.shuffled.pop());
+    renderCards(deck.bankerHand, cardContainer.bankerCard, false);
+    checkTrips7();
+    bankerPoints = calculateTotalPoints(deck.bankerHand);
+  }
+
+  whoWins();
+}
+
+function whoWins() {
+  const playerPoints = calculateTotalPoints(deck.playerHand);
+  const bankerPoints = calculateTotalPoints(deck.bankerHand);
+
+  if (playerPoints > 21 && bankerPoints > 21) {
+    //this condition is applicable for standForDouble
+    revealBankerFirstHiddenCard();
+    gameState.gameOver = true;
+    results.playerPoints.textContent = playerPoints;
+    results.bankerPoints.textContent = bankerPoints;
+    results.resultMessage.textContent = messages.push;
+    updateNoLosses();
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else if (playerPoints > bankerPoints && playerPoints <= 21) {
+    revealBankerFirstHiddenCard();
+    gameState.gameOver = true;
+    results.playerPoints.textContent = playerPoints;
+    results.bankerPoints.textContent = bankerPoints;
+    results.resultMessage.textContent = messages.win;
+    updateWinnings(2);
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else if (bankerPoints > playerPoints && bankerPoints <= 21) {
+    revealBankerFirstHiddenCard();
+    gameState.gameOver = true;
+    results.playerPoints.textContent = playerPoints;
+    results.bankerPoints.textContent = bankerPoints;
+    results.resultMessage.textContent = messages.lose;
+    updateLosses(0);
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else if (playerPoints > 21 && bankerPoints <= 21) {
+    revealBankerFirstHiddenCard();
+    gameState.gameOver = true;
+    results.playerPoints.textContent = playerPoints;
+    results.bankerPoints.textContent = bankerPoints;
+    results.resultMessage.textContent = messages.lose;
+    updateLosses(0);
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else if (bankerPoints > 21 && playerPoints <= 21) {
+    revealBankerFirstHiddenCard();
+    gameState.gameOver = true;
+    results.playerPoints.textContent = playerPoints;
+    results.bankerPoints.textContent = bankerPoints;
+    results.resultMessage.textContent = messages.win;
+    updateWinnings(2);
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else if (playerPoints === bankerPoints) {
+    revealBankerFirstHiddenCard();
+    gameState.gameOver = true;
+    results.playerPoints.textContent = playerPoints;
+    results.bankerPoints.textContent = bankerPoints;
+    results.resultMessage.textContent = messages.push;
+    updateNoLosses();
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  }
+}
+
+function zao() {
+  const playerPoints = calculateTotalPoints(deck.playerHand);
+
+  if (deck.playerHand.length === 2 && playerPoints === 15) {
+    results.resultMessage.textContent = messages.push;
+    updateNoLosses();
+    disableInGameChoices();
+    setTimeout(nextRound, 5000);
+  } else {
+    results.resultMessage.textContent =
+      "There's no backing out now. Keep playing! 😅";
+  }
+}
+
+function deal() {
+  shuffleDeck();
+
+  deck.bankerHand = [deck.shuffled.pop(), deck.shuffled.pop()];
+  deck.playerHand = [deck.shuffled.pop(), deck.shuffled.pop()];
+
+  renderCards(
+    deck.bankerHand,
+    cardContainer.bankerCard,
+    gameState.bankerFirstCardHidden
+  );
+  renderCards(deck.playerHand, cardContainer.playerCard, false);
 }
 
 function nextRound() {
@@ -443,6 +572,52 @@ function nextRound() {
   enableInGameChoices();
   checkForBrokeInstances();
 }
+
+function startGame() {
+  if (bettingInfo.betAmount < 5) {
+    displayAndCenterErrorMessage();
+    return;
+  }
+  deal();
+  hideInGameChoices("");
+  hideBankerAndPlayerPoints("");
+  hideStarting4Cards("");
+  revertErrorMessage();
+  hideChips("none");
+  hideInputChoices();
+
+  checkBlackJackAndBanBan();
+  if (gameState.gameOver === false) {
+    checkBlackJack();
+  }
+
+  if (gameState.gameOver === false) {
+    checkBanBan();
+  }
+}
+
+function checkForBrokeInstances() {
+  if (bettingInfo.balance <= 0) {
+    let playAgain = confirm(
+      "Thank you for playing. If your balance is negative, make sure to clear your debt with Ah Huat 👴🏼 first!"
+    );
+    if (playAgain) {
+      bettingInfo.balance = 1000;
+      bettingInfo.betAmount = 0;
+      showBet();
+      init();
+    } else {
+      results.resultMessage.style.marginTop = "280px";
+      results.resultMessage.textContent =
+        "Thank you for playing. If your balance is negative, remember to clear your debt with Ah Huat 👴🏼 first, before refreshing the page to play again.";
+      disableInGameChoices();
+      disableChips();
+      disableInputChoices();
+    }
+  }
+}
+
+/*----- other functions -----*/
 
 function disableChips() {
   for (const key in chips) {
@@ -477,128 +652,6 @@ function revealBankerFirstHiddenCard() {
   renderCards(deck.bankerHand, cardContainer.bankerCard, false);
 }
 
-function revealBankerFirstHiddenAndPoints() {
-  if (gameState.bankerFirstCardHidden) {
-    revealBankerFirstHiddenCard();
-  }
-
-  const bankerPoints = calculateTotalPoints(deck.bankerHand);
-  results.bankerPoints.textContent = bankerPoints;
-}
-
-function stand() {
-  checkTrips7();
-
-  const playerPoints = calculateTotalPoints(deck.playerHand);
-  let bankerPoints = calculateTotalPoints(deck.bankerHand);
-
-  if (playerPoints < 16) {
-    results.resultMessage.textContent = messages.cannotStand;
-    return;
-  }
-
-  while (bankerPoints < 16) {
-    deck.bankerHand.push(deck.shuffled.pop());
-    renderCards(deck.bankerHand, cardContainer.bankerCard, false);
-    bankerPoints = calculateTotalPoints(deck.bankerHand);
-  }
-
-  revealBankerFirstHiddenAndPoints();
-  whoWins();
-}
-
-function standForDouble() {
-  checkTrips7();
-
-  let bankerPoints = calculateTotalPoints(deck.bankerHand);
-
-  while (bankerPoints < 16) {
-    deck.bankerHand.push(deck.shuffled.pop());
-    renderCards(deck.bankerHand, cardContainer.bankerCard, false);
-    bankerPoints = calculateTotalPoints(deck.bankerHand);
-  }
-
-  revealBankerFirstHiddenAndPoints();
-  whoWins();
-}
-
-function whoWins() {
-  const playerPoints = calculateTotalPoints(deck.playerHand);
-  const bankerPoints = calculateTotalPoints(deck.bankerHand);
-
-  if (playerPoints > 21) {
-    results.resultMessage.textContent = messages.lose;
-    updateLossesForHit();
-    disableInGameChoices();
-    setTimeout(nextRound, 5000);
-  } else if (bankerPoints > 21 || playerPoints > bankerPoints) {
-    results.resultMessage.textContent = messages.win;
-    updateWinnings(2);
-    disableInGameChoices();
-    setTimeout(nextRound, 5000);
-  } else if (playerPoints < bankerPoints) {
-    results.resultMessage.textContent = messages.lose;
-    updateLossesForHit();
-    disableInGameChoices();
-    setTimeout(nextRound, 5000);
-  } else {
-    results.resultMessage.textContent = messages.push;
-    updateNoLosses();
-    disableInGameChoices();
-    setTimeout(nextRound, 5000);
-  }
-
-  results.playerPoints.textContent = playerPoints;
-  results.bankerPoints.textContent = bankerPoints;
-}
-
-function zao() {
-  const playerPoints = calculateTotalPoints(deck.playerHand);
-
-  if (deck.playerHand.length === 2 && playerPoints === 15) {
-    results.resultMessage.textContent = messages.push;
-    updateNoLosses();
-    disableInGameChoices();
-    setTimeout(nextRound, 5000);
-  } else {
-    results.resultMessage.textContent =
-      "There's no backing out now. Keep playing! 😅";
-  }
-}
-
-function double() {
-  if (bettingInfo.balance < bettingInfo.betAmount) {
-    results.resultMessage.textContent = "You're too broke to double down! 😓";
-    return;
-  }
-
-  bettingInfo.balance -= bettingInfo.betAmount;
-  bettingInfo.betAmount += bettingInfo.betAmount;
-  showBet();
-
-  deck.playerHand.push(deck.shuffled.pop());
-  renderCards(deck.playerHand, cardContainer.playerCard, false);
-
-  const playerPoints = calculateTotalPoints(deck.playerHand);
-  results.playerPoints.textContent = playerPoints;
-
-  standForDouble();
-}
-
-function deal() {
-  shuffleDeck();
-
-  deck.bankerHand = [deck.shuffled.pop(), deck.shuffled.pop()];
-  deck.playerHand = [deck.shuffled.pop(), deck.shuffled.pop()];
-
-  renderCards(
-    deck.bankerHand,
-    cardContainer.bankerCard,
-    gameState.bankerFirstCardHidden
-  );
-  renderCards(deck.playerHand, cardContainer.playerCard, false);
-}
-
 /*----- betting functions -----*/
 
 function bet(amount) {
@@ -608,7 +661,6 @@ function bet(amount) {
     bettingInfo.history.push(amount);
     showBet();
   } else {
-    results.resultMessage.style.marginTop = "280px";
     results.resultMessage.textContent = messages.insufficientBal;
   }
 }
@@ -644,11 +696,6 @@ function updateWinnings(numberOfTimes) {
 function updateLosses(numberOfTimes) {
   const lossAmount = bettingInfo.betAmount * numberOfTimes;
   bettingInfo.balance -= lossAmount;
-  bettingInfo.betAmount = 0;
-  showBet();
-}
-
-function updateLossesForHit() {
   bettingInfo.betAmount = 0;
   showBet();
 }
@@ -719,48 +766,9 @@ function welcomeMessageandInstruction() {
     "welcome to the world of 🌍 blackjack, please place a bet amount of at least $5 💵.";
 }
 
-function startGame() {
-  if (bettingInfo.betAmount < 5) {
-    displayAndCenterErrorMessage();
-    return;
-  }
-  deal();
-  hideInGameChoices("");
-  hideBankerAndPlayerPoints("");
-  hideStarting4Cards("");
-  revertErrorMessage();
-  hideChips("none");
-  hideInputChoices();
-
-  checkBlackJackAndBanBan();
-  checkBlackJack();
-  checkBanBan();
-}
-
-function checkForBrokeInstances() {
-  if (bettingInfo.balance <= 0) {
-    let playAgain = confirm(
-      "Thank you for playing. If your balance is negative, make sure to clear your debt with Ah Huat 👴🏼 first!"
-    );
-    if (playAgain) {
-      bettingInfo.balance = 1000;
-      bettingInfo.betAmount = 0;
-      showBet();
-      init();
-    } else {
-      results.resultMessage.style.marginTop = "280px";
-      results.resultMessage.textContent =
-        "Thank you for playing. If your balance is negative, remember to clear your debt with Ah Huat 👴🏼 first, before refreshing the page to play again.";
-      disableInGameChoices();
-      disableChips();
-      disableInputChoices();
-    }
-  }
-}
-
 //Testing
 
-// function testforBanBan() {
+// function testForBanBan() {
 //   deck.playerHand = [
 //     { face: "10-C", point: 10 },
 //     { face: "6-H", point: 6 },
@@ -768,6 +776,42 @@ function checkForBrokeInstances() {
 //   deck.bankerHand = [
 //     { face: "A-C", point: 11 },
 //     { face: "A-D", point: 11 },
+//   ];
+
+//   renderCards(
+//     deck.bankerHand,
+//     cardContainer.bankerCard,
+//     gameState.bankerFirstCardHidden
+//   );
+//   renderCards(deck.playerHand, cardContainer.playerCard, false);
+// }
+
+// function testForBlackJack() {
+//   deck.playerHand = [
+//     { face: "10-C", point: 10 },
+//     { face: "6-H", point: 6 },
+//   ];
+//   deck.bankerHand = [
+//     { face: "A-C", point: 11 },
+//     { face: "10-D", point: 10 },
+//   ];
+
+//   renderCards(
+//     deck.bankerHand,
+//     cardContainer.bankerCard,
+//     gameState.bankerFirstCardHidden
+//   );
+//   renderCards(deck.playerHand, cardContainer.playerCard, false);
+// }
+
+// function testForZao() {
+//   deck.playerHand = [
+//     { face: "10-C", point: 10 },
+//     { face: "5-H", point: 5 },
+//   ];
+//   deck.bankerHand = [
+//     { face: "A-C", point: 11 },
+//     { face: "10-D", point: 10 },
 //   ];
 
 //   renderCards(
