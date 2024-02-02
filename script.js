@@ -128,7 +128,7 @@ function init() {
   hideInGameChoices("none");
   hideBankerAndPlayerPoints("none");
   hideStarting4Cards("none");
-  welcomeMessageandInstruction();
+  welcomeMessageAndInstruction();
 }
 
 function buildDeck() {
@@ -652,60 +652,6 @@ function revealBankerFirstHiddenCard() {
   renderCards(deck.bankerHand, cardContainer.bankerCard, false);
 }
 
-/*----- betting functions -----*/
-
-function bet(amount) {
-  if (bettingInfo.balance >= amount) {
-    bettingInfo.balance -= amount;
-    bettingInfo.betAmount += amount;
-    bettingInfo.history.push(amount);
-    showBet();
-  } else {
-    results.resultMessage.textContent = messages.insufficientBal;
-  }
-}
-
-function showBet() {
-  balanceAndBettingAmt.balanceAmount.textContent = bettingInfo.balance;
-  balanceAndBettingAmt.bettingAmount.textContent = bettingInfo.betAmount;
-}
-
-function undoPreviousBet() {
-  if (bettingInfo.history.length > 0 && bettingInfo.betAmount > 0) {
-    const previousBetAmount = bettingInfo.history.pop();
-    bettingInfo.balance += previousBetAmount;
-    bettingInfo.betAmount -= previousBetAmount;
-    showBet();
-  }
-}
-
-function clearBet() {
-  bettingInfo.history = [];
-  bettingInfo.balance += bettingInfo.betAmount;
-  bettingInfo.betAmount = 0;
-  showBet();
-}
-
-function updateWinnings(numberOfTimes) {
-  const winAmount = bettingInfo.betAmount * numberOfTimes;
-  bettingInfo.balance += winAmount;
-  bettingInfo.betAmount = 0;
-  showBet();
-}
-
-function updateLosses(numberOfTimes) {
-  const lossAmount = bettingInfo.betAmount * numberOfTimes;
-  bettingInfo.balance -= lossAmount;
-  bettingInfo.betAmount = 0;
-  showBet();
-}
-
-function updateNoLosses() {
-  bettingInfo.balance += bettingInfo.betAmount;
-  bettingInfo.betAmount = 0;
-  showBet();
-}
-
 function hideInGameChoices(displayStyle) {
   for (const key in inGameChoices) {
     if (inGameChoices.hasOwnProperty(key)) {
@@ -760,10 +706,64 @@ function revertErrorMessage() {
   results.resultMessage.style.marginTop = "0px";
 }
 
-function welcomeMessageandInstruction() {
+function welcomeMessageAndInstruction() {
   results.resultMessage.style.marginTop = "280px";
   results.resultMessage.textContent =
     "welcome to the world of 🌍 blackjack, please place a bet amount of at least $5 💵.";
+}
+
+/*----- betting functions -----*/
+
+function bet(amount) {
+  if (bettingInfo.balance >= amount) {
+    bettingInfo.balance -= amount;
+    bettingInfo.betAmount += amount;
+    bettingInfo.history.push(amount);
+    showBet();
+  } else {
+    results.resultMessage.textContent = messages.insufficientBal;
+  }
+}
+
+function showBet() {
+  balanceAndBettingAmt.balanceAmount.textContent = bettingInfo.balance;
+  balanceAndBettingAmt.bettingAmount.textContent = bettingInfo.betAmount;
+}
+
+function undoPreviousBet() {
+  if (bettingInfo.history.length > 0 && bettingInfo.betAmount > 0) {
+    const previousBetAmount = bettingInfo.history.pop();
+    bettingInfo.balance += previousBetAmount;
+    bettingInfo.betAmount -= previousBetAmount;
+    showBet();
+  }
+}
+
+function clearBet() {
+  bettingInfo.history = [];
+  bettingInfo.balance += bettingInfo.betAmount;
+  bettingInfo.betAmount = 0;
+  showBet();
+}
+
+function updateWinnings(numberOfTimes) {
+  const winAmount = bettingInfo.betAmount * numberOfTimes;
+  bettingInfo.balance += winAmount;
+  bettingInfo.betAmount = 0;
+  showBet();
+}
+
+function updateLosses(numberOfTimes) {
+  const lossAmount = bettingInfo.betAmount * numberOfTimes;
+  bettingInfo.balance -= lossAmount;
+  bettingInfo.betAmount = 0;
+  showBet();
+}
+
+function updateNoLosses() {
+  bettingInfo.balance += bettingInfo.betAmount;
+  bettingInfo.betAmount = 0;
+  showBet();
 }
 
 //Testing

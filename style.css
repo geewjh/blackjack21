@@ -20,29 +20,29 @@ p {
 }
 
 .banker-points-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    position: absolute; /* to position absolute within the relative parent */
-    right: 230px; /* move to right */
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: absolute; /* to position absolute within the relative parent */
+  right: 230px; /* move to right */
+}
 
-  .banker-card-container {
-    margin-top: 50px;
-  }
+.banker-card-container {
+  margin-top: 50px;
+}
 
-  .player-points-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    position: absolute; 
-    right: 240px; /* move to right */
-    top: 300px; /* push downwards as flex makes it float up */
-  }
+.player-points-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: absolute; 
+  right: 240px; /* move to right */
+  top: 300px; /* push downwards as flex makes it float up */
+}
 
 img {
-    height: 120px; 
-    margin: 5px 5px;
+  height: 120px; 
+  margin: 5px 5px;
 }
 
 .footer {
@@ -105,7 +105,7 @@ img {
   font-size: 1rem;
   line-height: 23px;
   outline: none;
-  padding: .75rem;
+  padding: .7rem;
   text-decoration: none;
   transition: all 235ms ease-in-out;
   border-bottom-left-radius: 15px 255px;
