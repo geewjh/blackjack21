@@ -41,9 +41,6 @@ const deck = {
 const gameState = {
   gameOver: false,
   bankerFirstCardHidden: true,
-  playerBlackJack: false,
-  playerBanBan: false,
-  playerTrips7: false,
 };
 
 const bettingInfo = {
@@ -118,9 +115,6 @@ function init() {
   deck.playerHand = [];
   gameState.gameOver = false;
   gameState.bankerFirstCardHidden = true;
-  gameState.playerBlackJack = false;
-  gameState.playerBanBan = false;
-  gameState.playerTrips7 = false;
   bettingInfo.balance = 1000;
   bettingInfo.betAmount = 0;
   bettingInfo.history = [];
@@ -235,7 +229,6 @@ function checkBlackJack() {
 
   if (playerPoints === 21 && bankerPoints !== 21) {
     revealBankerFirstHiddenCard();
-    gameState.playerBlackJack = true;
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.playerBJ;
     results.bankerPoints.textContent = bankerPoints;
@@ -268,7 +261,6 @@ function checkBlackJack() {
   } else if (bankerPoints === 21 && playerPoints === 21) {
     revealBankerFirstHiddenCard();
     gameState.gameOver = true;
-    gameState.playerBlackJack = true;
     results.resultMessage.textContent = messages.push;
     results.bankerPoints.textContent = "blackjack";
     results.playerPoints.textContent = "blackjack";
@@ -292,7 +284,6 @@ function checkBanBan() {
     deck.playerHand[1].point === 11
   ) {
     revealBankerFirstHiddenCard();
-    gameState.playerBanBan = true;
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.push;
     results.bankerPoints.textContent = "ban ban";
@@ -306,7 +297,6 @@ function checkBanBan() {
     bankerPoints !== 21
   ) {
     revealBankerFirstHiddenCard();
-    gameState.playerBanBan = true;
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.playerBB;
     results.bankerPoints.textContent = bankerPoints;
@@ -354,7 +344,6 @@ function checkTrips7() {
     deck.playerHand[1].point === 7 &&
     deck.playerHand[2].point === 7
   ) {
-    gameState.playerTrips7 = true;
     gameState.gameOver = true;
     results.resultMessage.textContent = messages.player777;
     results.playerPoints.textContent = "trips 7";
