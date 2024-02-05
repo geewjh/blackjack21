@@ -2,7 +2,7 @@
 
 ## Description
 
-This game was recreated by adding a Singaporean twist to the most widely played casino banking game in the world!
+This game was recreated by adding a Singaporean twist to the most widely played casino banking game in the world whilst not totally neglecting the western origin of it. 
 
 ## How to play
 
